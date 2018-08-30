@@ -128,7 +128,8 @@ def main(unused_argv):
 
     # Crop the valid regions from the predictions.
     semantic_predictions = tf.slice(
-        predictions[common.OUTPUT_TYPE],
+        # predictions[common.OUTPUT_TYPE], # int64 not supported on mobile phone
+        tf.cast(predictions[common.OUTPUT_TYPE], tf.int32), # convert int64 to int32 to use in mobile phone 
         [0, 0, 0],
         [1, resized_image_size[0], resized_image_size[1]])
     # Resize back the prediction to the original image size.
