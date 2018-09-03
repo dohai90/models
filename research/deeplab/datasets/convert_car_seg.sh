@@ -53,44 +53,32 @@ cd "${CURRENT_DIR}"
 # Root path for car dataset.
 PASCAL_ROOT="${WORK_DIR}/VOCdevkit/VOC2012"
 
-# Remove the colormap in the ground truth annotations.
+# Copies JPEG background images, creates color map annotations
+# and Remove the colormap in the ground truth annotations.
 JPEG_BACKGROUND_FOLDER="${PASCAL_ROOT}/JPEGImages"
+SEG_FOLDER="${PASCAL_ROOT}/SegmentationClass"
 SEMANTIC_SEG_FOLDER="${PASCAL_ROOT}/SegmentationClassRaw"
 
 if [ ! -d "${JPEG_BACKGROUND_FOLDER}" ]; then
   mkdir -p "${JPEG_BACKGROUND_FOLDER}"
 fi
 
+if [ ! -d "${SEG_FOLDER}" ]; then
+  mkdir -p "${SEG_FOLDER}"
+fi
+
 if [ ! -d "${SEMANTIC_SEG_FOLDER}" ]; then
   mkdir -p "${SEMANTIC_SEG_FOLDER}"
 fi
 
+echo "Copies JPEG images and create color map annotations"
+python ./preprocess_car_seg.py |
+  --seg_list_path="${CURRENT_DIR}/${WORK_DIR}/segmentations.txt"
+  --jpeg_list_path="${CURRENT_DIR}/${WORK_DIR}/backgrounds.txt"
+  --jpeg_folder="${JPEG_BACKGROUND_FOLDER}"
+  --seg_folder="${SEMANTIC_SEG_FOLDER}"
+
 echo "Removing the color map in ground truth annotations..."
 python ./remove_gt_colormap.py \
-  --output_jpg_dir="${JPEG_BACKGROUND_FOLDER}"
-  --output_seg_dir="${SEMANTIC_SEG_FOLDER}"
-
-# Root path for augmented VOC dataset.
-AUG_VOC_ROOT="${WORK_DIR}/benchmark_RELEASE/dataset"
-
-# Create train_aug and copy images/annotation into correct folder
-echo "Creating train_aug..."
-python ./add_voc2012_aug_dataset.py \
-  --aug_data_folder="${AUG_VOC_ROOT}" \
-  --original_folder="${PASCAL_ROOT}"
-
-# Build TFRecords of the dataset.
-# First, create output directory for storing TFRecords.
-OUTPUT_DIR="${WORK_DIR}/tfrecord"
-mkdir -p "${OUTPUT_DIR}"
-
-IMAGE_FOLDER="${PASCAL_ROOT}/JPEGImages"
-LIST_FOLDER="${PASCAL_ROOT}/ImageSets/Segmentation"
-
-echo "Converting PASCAL VOC 2012 dataset..."
-python ./build_voc2012_data.py \
-  --image_folder="${IMAGE_FOLDER}" \
-  --semantic_segmentation_folder="${SEMANTIC_SEG_FOLDER}" \
-  --list_folder="${LIST_FOLDER}" \
-  --image_format="jpg" \
-  --output_dir="${OUTPUT_DIR}"
+  --original_gt_folder="${SEG_FOLDER}" \
+  --output_dir="${SEMANTIC_SEG_FOLDER}"
