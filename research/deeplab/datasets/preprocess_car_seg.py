@@ -18,6 +18,7 @@ the results to output_dir.
 """
 
 import os
+import sys
 import numpy as np
 from PIL import Image
 import argparse
@@ -96,9 +97,13 @@ args = vars(ap.parse_args())
 
 # Copy jpeg background images to jpeg_folder
 def copy_background_jpeg(jpeg_list_path, output_dir):
+    print("Copy images process starts ...")
     jpeg_list = [x.strip('\n') for x in open(jpeg_list_path, 'r')]
-    for jpeg in jpeg_list:
-        jpeg_tokens = jpeg.split('/')[3:]
+    for idx, jpeg in enumerate(jpeg_list):
+        sys.stdout.write('\r>> Copying image %d/%d' % (
+            idx + 1, len(jpeg_list)))
+        sys.stdout.flush()
+        jpeg_tokens = jpeg.split('/')[4:]
         jpeg_name = "_".join(jpeg_tokens)
         copyfile(jpeg, os.path.join(output_dir, jpeg_name))
 
@@ -121,7 +126,11 @@ def create_annotation_with_color_map(seg_list_path, output_dir):
     # Read images and preprocess images
     seg_list = [x.strip("\n") for x in open(seg_list_path, 'r')]
 
-    for seg in seg_list:
+    print("Creates annotation process starts ...")
+    for idx, seg in enumerate(seg_list):
+        sys.stdout.write('\r>> Converting annotation %d/%d' % (
+            idx + 1, len(seg_list)))
+        sys.stdout.flush()
         img_np = np.array(Image.open(seg), dtype=np.int32)
         height, width = img_np.shape[0], img_np.shape[1]
         img_np += 5
@@ -139,7 +148,7 @@ def create_annotation_with_color_map(seg_list_path, output_dir):
         annotation_2d = np.reshape(annotation, [height, width])
         pil_img = Image.fromarray(np.array(annotation_2d, dtype=np.uint8))
         pil_img.putpalette(palette)
-        seg_tokens = seg.split('/')[3:]
+        seg_tokens = seg.split('/')[4:]
         seg_name = '_'.join(seg_tokens)
         pil_img.save(os.path.join(output_dir, seg_name[:-4] + ".png"))
 
