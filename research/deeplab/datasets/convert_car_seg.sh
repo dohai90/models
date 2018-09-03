@@ -76,7 +76,7 @@ python ./preprocess_car_seg.py \
   --seg_list_path="${CURRENT_DIR}/${WORK_DIR}/segmentations.txt" \
   --jpeg_list_path="${CURRENT_DIR}/${WORK_DIR}/backgrounds.txt" \
   --jpeg_folder="${JPEG_BACKGROUND_FOLDER}" \
-  --seg_folder="${SEMANTIC_SEG_FOLDER}"
+  --seg_folder="${SEG_FOLDER}"
 
 echo "Removing the color map in ground truth annotations..."
 python ./remove_gt_colormap.py \

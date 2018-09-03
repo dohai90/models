@@ -150,9 +150,10 @@ def create_annotation_with_color_map(seg_list_path, output_dir):
         pil_img.putpalette(palette)
         seg_tokens = seg.split('/')[4:]
         seg_name = '_'.join(seg_tokens)
-        pil_img.save(os.path.join(output_dir, seg_name[:-4] + ".png"))
+        pil_img.save(os.path.join(output_dir, seg_name[:-4] + ".png"), 'PNG')
 
 
 if __name__ == "__main__":
     copy_background_jpeg(args["jpeg_list_path"], args["jpeg_folder"])
+    print()
     create_annotation_with_color_map(args["seg_list_path"], args["seg_folder"])
