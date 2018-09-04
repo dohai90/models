@@ -12,7 +12,7 @@
 # limitations under the License.
 # ==============================================================================
 #
-# This script is used to run local test on PASCAL VOC 2012 using MobileNet-v2.
+# This script is used to run train, val and visualize on car_seg dataset using MobileNet-v2.
 # Users could also modify from this script for their use case.
 #
 # Usage:
@@ -40,9 +40,9 @@ python "${WORK_DIR}"/model_test.py -v
 # Go to datasets folder and check car_seg is presented or not.
 # If not, run convert_car_seg.sh
 DATASET_DIR="datasets"
-PASCAL_FOLDER="car_seg"
+CAR_FOLDER="car_seg"
 cd "${WORK_DIR}/${DATASET_DIR}"
-if [ ! -d "${PASCAL_FOLDER}" ]; then
+if [ ! -d "${CAR_FOLDER}" ]; then
   sh convert_car_seg.sh
 fi
 
@@ -51,11 +51,11 @@ cd "${CURRENT_DIR}"
 
 # Set up the working directories.
 EXP_FOLDER="exp/train_car_seg_mobilenetv2"
-INIT_FOLDER="${WORK_DIR}/${DATASET_DIR}/${PASCAL_FOLDER}/init_models"
-TRAIN_LOGDIR="${WORK_DIR}/${DATASET_DIR}/${PASCAL_FOLDER}/${EXP_FOLDER}/train"
-EVAL_LOGDIR="${WORK_DIR}/${DATASET_DIR}/${PASCAL_FOLDER}/${EXP_FOLDER}/eval"
-VIS_LOGDIR="${WORK_DIR}/${DATASET_DIR}/${PASCAL_FOLDER}/${EXP_FOLDER}/vis"
-EXPORT_DIR="${WORK_DIR}/${DATASET_DIR}/${PASCAL_FOLDER}/${EXP_FOLDER}/export"
+INIT_FOLDER="${WORK_DIR}/${DATASET_DIR}/${CAR_FOLDER}/init_models"
+TRAIN_LOGDIR="${WORK_DIR}/${DATASET_DIR}/${CAR_FOLDER}/${EXP_FOLDER}/train"
+EVAL_LOGDIR="${WORK_DIR}/${DATASET_DIR}/${CAR_FOLDER}/${EXP_FOLDER}/eval"
+VIS_LOGDIR="${WORK_DIR}/${DATASET_DIR}/${CAR_FOLDER}/${EXP_FOLDER}/vis"
+EXPORT_DIR="${WORK_DIR}/${DATASET_DIR}/${CAR_FOLDER}/${EXP_FOLDER}/export"
 
 if [ ! -d "${INIT_FOLDER}" ]; then
   mkdir -p "${INIT_FOLDER}"
@@ -85,7 +85,7 @@ if [ ! -d "${CKPT_NAME}" ]; then
 fi
 cd "${CURRENT_DIR}"
 
-PASCAL_DATASET="${WORK_DIR}/${DATASET_DIR}/${PASCAL_FOLDER}/tfrecord"
+CAR_DATASET="${WORK_DIR}/${DATASET_DIR}/${CAR_FOLDER}/tfrecord"
 
 # Train 30000 iterations.
 NUM_ITERATIONS=30000
@@ -102,4 +102,4 @@ python "${WORK_DIR}"/train.py \
   --fine_tune_batch_norm=true \
   --tf_initial_checkpoint="${INIT_FOLDER}/${CKPT_NAME}/mobilenet_v2_1.0_224.ckpt" \
   --train_logdir="${TRAIN_LOGDIR}" \
-  --dataset_dir="${PASCAL_DATASET}"
+  --dataset_dir="${CAR_DATASET}"
