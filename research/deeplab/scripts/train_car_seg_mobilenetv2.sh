@@ -78,12 +78,11 @@ if [ ! -d "${EXPORT_DIR}" ]; then
 fi
 
 # Copy locally the trained checkpoint as the initial checkpoint.
-TF_INIT_ROOT="http://download.tensorflow.org/models"
-CKPT_NAME="deeplabv3_mnv2_pascal_train_aug"
-TF_INIT_CKPT="${CKPT_NAME}_2018_01_29.tar.gz"
+CKPT_NAME="mobilenet_v2_1.0_224"
 cd "${INIT_FOLDER}"
-wget -nd -c "${TF_INIT_ROOT}/${TF_INIT_CKPT}"
-tar -xf "${TF_INIT_CKPT}"
+if [ ! -d "${CKPT_NAME}" ]; then
+  ln -s "/content/dohai90/pretrained_models/mobilenet_v2_1.0_224"
+fi
 cd "${CURRENT_DIR}"
 
 PASCAL_DATASET="${WORK_DIR}/${DATASET_DIR}/${PASCAL_FOLDER}/tfrecord"
@@ -101,6 +100,6 @@ python "${WORK_DIR}"/train.py \
   --train_batch_size=4 \
   --training_number_of_steps="${NUM_ITERATIONS}" \
   --fine_tune_batch_norm=true \
-  --tf_initial_checkpoint="${INIT_FOLDER}/${CKPT_NAME}/model.ckpt-30000" \
+  --tf_initial_checkpoint="${INIT_FOLDER}/${CKPT_NAME}/mobilenet_v2_1.0_224.ckpt" \
   --train_logdir="${TRAIN_LOGDIR}" \
   --dataset_dir="${PASCAL_DATASET}"
