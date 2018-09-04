@@ -91,9 +91,10 @@ CAR_DATASET="${WORK_DIR}/${DATASET_DIR}/${CAR_FOLDER}/tfrecord"
 NUM_ITERATIONS=300000
 python "${WORK_DIR}"/train.py \
   --logtostderr \
+  --num_clones=2 \
   --dataset="car_seg" \
   --log_steps=100 \
-  --base_learning_rate=0.007
+  --base_learning_rate=0.007 \
   --train_split="trainval" \
   --model_variant="mobilenet_v2" \
   --output_stride=16 \

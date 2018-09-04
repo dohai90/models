@@ -1,3 +1,4 @@
+# ==============================================================================
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -9,6 +10,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Written by Do Trung Hai (dohai90) and Juhyung Park (jhpark)
 # ==============================================================================
 
 """Copies JPEG files and creates the segmentation color map.
@@ -106,6 +109,8 @@ def copy_background_jpeg(jpeg_list_path, output_dir):
         jpeg_tokens = jpeg.split('/')[4:]
         jpeg_name = "_".join(jpeg_tokens)
         copyfile(jpeg, os.path.join(output_dir, jpeg_name))
+    sys.stdout.write('\n')
+    sys.stdout.flush()
 
 
 def create_annotation_with_color_map(seg_list_path, output_dir):
@@ -133,6 +138,7 @@ def create_annotation_with_color_map(seg_list_path, output_dir):
         sys.stdout.flush()
         img_np = np.array(Image.open(seg), dtype=np.int32)
         height, width = img_np.shape[0], img_np.shape[1]
+        # Remove anti-aliasing artifact
         img_np += 5
         img_np = (img_np // 10) * 10
         img_np = np.clip(img_np, 0, 255)
@@ -151,9 +157,10 @@ def create_annotation_with_color_map(seg_list_path, output_dir):
         seg_tokens = seg.split('/')[4:]
         seg_name = '_'.join(seg_tokens)
         pil_img.save(os.path.join(output_dir, seg_name[:-4] + ".png"), 'PNG')
+    sys.stdout.write('\n')
+    sys.stdout.flush()
 
 
 if __name__ == "__main__":
     copy_background_jpeg(args["jpeg_list_path"], args["jpeg_folder"])
-    print()
     create_annotation_with_color_map(args["seg_list_path"], args["seg_folder"])
