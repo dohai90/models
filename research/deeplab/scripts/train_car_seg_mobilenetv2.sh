@@ -88,18 +88,34 @@ cd "${CURRENT_DIR}"
 CAR_DATASET="${WORK_DIR}/${DATASET_DIR}/${CAR_FOLDER}/tfrecord"
 
 # Train 30000 iterations.
-NUM_ITERATIONS=30000
+NUM_ITERATIONS=300000
 python "${WORK_DIR}"/train.py \
   --logtostderr \
   --dataset="car_seg" \
-  --train_split="train" \
+  --log_steps=100 \
+  --base_learning_rate=0.007
+  --train_split="trainval" \
   --model_variant="mobilenet_v2" \
   --output_stride=16 \
   --train_crop_size=513 \
   --train_crop_size=513 \
-  --train_batch_size=4 \
+  --train_batch_size=16 \
   --training_number_of_steps="${NUM_ITERATIONS}" \
   --fine_tune_batch_norm=true \
   --tf_initial_checkpoint="${INIT_FOLDER}/${CKPT_NAME}/mobilenet_v2_1.0_224.ckpt" \
   --train_logdir="${TRAIN_LOGDIR}" \
   --dataset_dir="${CAR_DATASET}"
+
+# Export the trained checkpoint.
+CKPT_PATH="${TRAIN_LOGDIR}/model.ckpt-${NUM_ITERATIONS}"
+EXPORT_PATH="${EXPORT_DIR}/frozen_inference_graph.pb"
+
+python "${WORK_DIR}"/export_model.py \
+  --logtostderr \
+  --checkpoint_path="${CKPT_PATH}" \
+  --export_path="${EXPORT_PATH}" \
+  --model_variant="mobilenet_v2" \
+  --num_classes=28 \
+  --crop_size=513 \
+  --crop_size=513 \
+  --inference_scales=1.0
