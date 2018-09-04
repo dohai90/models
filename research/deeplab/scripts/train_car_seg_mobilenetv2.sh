@@ -93,7 +93,7 @@ NUM_ITERATIONS=30000
 python "${WORK_DIR}"/train.py \
   --logtostderr \
   --dataset="car_seg" \
-  --train_split="trainval" \
+  --train_split="train" \
   --model_variant="mobilenet_v2" \
   --output_stride=16 \
   --train_crop_size=513 \
