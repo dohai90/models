@@ -97,6 +97,16 @@ _PASCAL_VOC_SEG_INFORMATION = DatasetDescriptor(
     ignore_label=255,
 )
 
+_CAR_SEG_INFORMATION = DatasetDescriptor(
+    splits_to_sizes={
+        'train': 3138,
+        'trainval': 3923,
+        'val': 785,
+    },
+    num_classes=28,
+    ignore_label=255,
+)
+
 # These number (i.e., 'train'/'test') seems to have to be hard coded
 # You are required to figure it out for your training/testing example.
 _ADE20K_INFORMATION = DatasetDescriptor(
@@ -112,6 +122,7 @@ _ADE20K_INFORMATION = DatasetDescriptor(
 _DATASETS_INFORMATION = {
     'cityscapes': _CITYSCAPES_INFORMATION,
     'pascal_voc_seg': _PASCAL_VOC_SEG_INFORMATION,
+    'car_seg': _CAR_SEG_INFORMATION,
     'ade20k': _ADE20K_INFORMATION,
 }
 
