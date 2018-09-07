@@ -22,6 +22,7 @@ the results to output_dir.
 
 import os
 import sys
+import cv2
 import numpy as np
 from PIL import Image
 import argparse
@@ -95,6 +96,8 @@ ap.add_argument("--seg_list_path", required=True, help="path to file including l
 ap.add_argument("--jpeg_list_path", required=True, help="path to file including list of jpeg file name")
 ap.add_argument("--jpeg_folder", required=True, help="path to jpeg folder")
 ap.add_argument("--seg_folder", required=True, help="path to segmentation with color map folder")
+ap.add_argument("--remove_salt_and_pepper_noise", required=True, type=bool, default=True,
+                help="remove salt and pepper noise in the annotation images")
 args = vars(ap.parse_args())
 
 
@@ -151,8 +154,12 @@ def create_annotation_with_color_map(seg_list_path, output_dir):
             except:
                 annotation.append(0)
 
-        annotation_2d = np.reshape(annotation, [height, width])
-        pil_img = Image.fromarray(np.array(annotation_2d, dtype=np.uint8))
+        annotation_2d = np.reshape(annotation, [height, width]).astype(np.uint8)
+
+        if args["remove_salt_and_pepper_noise"]:
+            annotation_2d = cv2.medianBlur(annotation_2d, 3)
+
+        pil_img = Image.fromarray(np.array(annotation_2d))
         pil_img.putpalette(palette)
         seg_tokens = seg.split('/')[4:]
         seg_name = '_'.join(seg_tokens)
