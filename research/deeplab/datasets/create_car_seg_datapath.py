@@ -17,17 +17,12 @@
 import os
 import glob
 import argparse
-import math
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--data_root", required=True,
                 help="path to folder including images.")
 ap.add_argument("--output_list_dir", required=True,
                 help="path to output folder including a list of background and annotations.")
-ap.add_argument("--jpeg_dir", required=True,
-                help="path to folder including background images.")
-ap.add_argument("--separate_dir", required=True,
-                help="path to output folder including separate train/val/trainval sets.")
 
 args = vars(ap.parse_args())
 
@@ -75,30 +70,5 @@ def list_backgrounds_and_annotations_path(data_root, output_list_dir):
             f.write(annotation_path+'\n')
 
 
-def separate_train_val_set(jpeg_dir, separate_dir):
-    base_names = []
-    _NUM_FOLDS = 5  # 4 folds for training and 1 fold for validation
-    trainval_output_filename = os.path.join(separate_dir, 'trainval.txt')
-    train_output_filename = os.path.join(separate_dir, 'train.txt')
-    val_output_filename = os.path.join(separate_dir, 'val.txt')
-    with open(trainval_output_filename, 'w') as f:
-        for background_path in glob.glob(os.path.join(jpeg_dir, '*')):
-            base_name = os.path.basename(background_path).replace('_0001_Background.jpg', '')
-            base_names.append(base_name)
-            f.write(base_name+'\n')
-
-    num_images = len(base_names)
-    num_per_fold = int(math.ceil(num_images / float(_NUM_FOLDS)))
-
-    with open(train_output_filename, 'w') as f:
-        for base_name in base_names[:(num_images-num_per_fold)]:
-            f.write(base_name+'\n')
-
-    with open(val_output_filename, 'w') as f:
-        for base_name in base_names[(num_images-num_per_fold):]:
-            f.write(base_name+'\n')
-
-
 if __name__ == "__main__":
     list_backgrounds_and_annotations_path(args["data_root"], args['output_list_dir'])
-    separate_train_val_set(args['jpeg_dir'], args['separate_dir'])

@@ -79,19 +79,19 @@ if [ ! -d "${LIST_FOLDER}" ]; then
   mkdir -p "${LIST_FOLDER}"
 fi
 
-echo "Create backgrounds and annotations list then separate into train/val/trainval sets..."
+
+echo "Create backgrounds and annotations list..."
 python ./create_car_seg_datapath.py \
   --data_root="${DATA_ROOT}" \
-  --output_list_dir="${WORK_DIR}" \
-  --jpeg_dir="${IMAGE_FOLDER}" \
-  --separate_dir="${LIST_FOLDER}"
+  --output_list_dir="${WORK_DIR}"
 
-echo "Copies JPEG images and create color map annotations"
+echo "Copies JPEG images and separates into train/val/trainval sets then creates color map annotations..."
 python ./preprocess_car_seg.py \
   --seg_list_path="${CURRENT_DIR}/${WORK_DIR}/segmentations.txt" \
   --jpeg_list_path="${CURRENT_DIR}/${WORK_DIR}/backgrounds.txt" \
   --jpeg_folder="${IMAGE_FOLDER}" \
   --seg_folder="${SEG_FOLDER}" \
+  --separate_folder="${LIST_FOLDER}" \
   --remove_salt_and_pepper_noise=true
 
 echo "Removing the color map in ground truth annotations..."
@@ -102,7 +102,7 @@ python ./remove_gt_colormap.py \
 # Build TFRecords of the dataset.
 # First, create output directory for storing TFRecords.
 OUTPUT_DIR="${WORK_DIR}/tfrecord"
-if [! -d "${OUTPUT_DIR}" ]; then
+if [ ! -d "${OUTPUT_DIR}" ]; then
   mkdir -p "${OUTPUT_DIR}"
 fi
 

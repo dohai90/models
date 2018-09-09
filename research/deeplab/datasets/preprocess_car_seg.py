@@ -23,6 +23,8 @@ the results to output_dir.
 import os
 import sys
 import cv2
+import glob
+import math
 import numpy as np
 from PIL import Image
 import argparse
@@ -96,6 +98,8 @@ ap.add_argument("--seg_list_path", required=True, help="path to file including l
 ap.add_argument("--jpeg_list_path", required=True, help="path to file including list of jpeg file name")
 ap.add_argument("--jpeg_folder", required=True, help="path to jpeg folder")
 ap.add_argument("--seg_folder", required=True, help="path to segmentation with color map folder")
+ap.add_argument("--separate_folder", required=True,
+                help="path to output folder including separate train/val/trainval sets.")
 ap.add_argument("--remove_salt_and_pepper_noise", required=True, type=bool, default=True,
                 help="remove salt and pepper noise in the annotation images")
 args = vars(ap.parse_args())
@@ -168,6 +172,31 @@ def create_annotation_with_color_map(seg_list_path, output_dir):
     sys.stdout.flush()
 
 
+def separate_train_val_set(jpeg_folder, separate_folder):
+    base_names = []
+    _NUM_FOLDS = 5  # 4 folds for training and 1 fold for validation
+    trainval_output_filename = os.path.join(separate_folder, 'trainval.txt')
+    train_output_filename = os.path.join(separate_folder, 'train.txt')
+    val_output_filename = os.path.join(separate_folder, 'val.txt')
+    with open(trainval_output_filename, 'w') as f:
+        for background_path in glob.glob(os.path.join(jpeg_folder, '*')):
+            base_name = os.path.basename(background_path).replace('_0001_Background.jpg', '')
+            base_names.append(base_name)
+            f.write(base_name+'\n')
+
+    num_images = len(base_names)
+    num_per_fold = int(math.ceil(num_images / float(_NUM_FOLDS)))
+
+    with open(train_output_filename, 'w') as f:
+        for base_name in base_names[:(num_images-num_per_fold)]:
+            f.write(base_name+'\n')
+
+    with open(val_output_filename, 'w') as f:
+        for base_name in base_names[(num_images-num_per_fold):]:
+            f.write(base_name+'\n')
+
+
 if __name__ == "__main__":
     copy_background_jpeg(args["jpeg_list_path"], args["jpeg_folder"])
+    separate_train_val_set(args["jpeg_folder"], args["separate_folder"])
     create_annotation_with_color_map(args["seg_list_path"], args["seg_folder"])
