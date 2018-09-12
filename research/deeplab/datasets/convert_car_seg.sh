@@ -37,7 +37,7 @@
 set -e
 
 CURRENT_DIR=$(pwd)
-WORK_DIR="./car_seg"
+WORK_DIR="./car_seg_resized_denoised"
 if [ ! -d "${WORK_DIR}" ]; then
   mkdir -p "${WORK_DIR}"
 fi
@@ -51,7 +51,7 @@ fi
 cd "${CURRENT_DIR}"
 
 # Root path for car dataset before processing.
-DATA_ROOT="/content/dohai90/car_mask_data"
+DATA_ROOT="/content/dohai90/old_car_mask_data"
 
 # Root path for car dataset for processing.
 CAR_ROOT="${WORK_DIR}/VOCdevkit/VOC2012"
@@ -92,6 +92,7 @@ python ./preprocess_car_seg.py \
   --jpeg_folder="${IMAGE_FOLDER}" \
   --seg_folder="${SEG_FOLDER}" \
   --separate_folder="${LIST_FOLDER}" \
+  --input_size=769 \
   --remove_salt_and_pepper_noise=true
 
 echo "Removing the color map in ground truth annotations..."

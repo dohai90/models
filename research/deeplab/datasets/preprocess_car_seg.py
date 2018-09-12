@@ -100,13 +100,14 @@ ap.add_argument("--jpeg_folder", required=True, help="path to jpeg folder")
 ap.add_argument("--seg_folder", required=True, help="path to segmentation with color map folder")
 ap.add_argument("--separate_folder", required=True,
                 help="path to output folder including separate train/val/trainval sets.")
-ap.add_argument("--remove_salt_and_pepper_noise", required=True, type=bool, default=True,
+ap.add_argument("--input_size", type=int, default=0, help="max input image size or 0 for original image size.")
+ap.add_argument("--remove_salt_and_pepper_noise", type=bool, default=True,
                 help="remove salt and pepper noise in the annotation images")
 args = vars(ap.parse_args())
 
 
 # Copy jpeg background images to jpeg_folder
-def copy_background_jpeg(jpeg_list_path, output_dir):
+def copy_background_jpeg(jpeg_list_path, output_dir, input_size=0):
     print("Copy images process starts ...")
     jpeg_list = [x.strip('\n') for x in open(jpeg_list_path, 'r')]
     for idx, jpeg in enumerate(jpeg_list):
@@ -115,12 +116,21 @@ def copy_background_jpeg(jpeg_list_path, output_dir):
         sys.stdout.flush()
         jpeg_tokens = jpeg.split('/')[4:]
         jpeg_name = "_".join(jpeg_tokens)
-        copyfile(jpeg, os.path.join(output_dir, jpeg_name))
+        if input_size != 0:
+            origin_img = Image.open(jpeg)
+            width, height = origin_img.size
+            resize_ratio = 1.0 * input_size / max(width, height)
+            width, height = (int(resize_ratio * width), int(resize_ratio * height))
+            origin_img = origin_img.resize((width, height), Image.ANTIALIAS)
+            origin_img.save(os.path.join(output_dir, jpeg_name), 'JPEG')
+        else:
+            copyfile(jpeg, os.path.join(output_dir, jpeg_name))
+
     sys.stdout.write('\n')
     sys.stdout.flush()
 
 
-def create_annotation_with_color_map(seg_list_path, output_dir):
+def create_annotation_with_color_map(seg_list_path, output_dir, input_size=0, remove_noise=True):
     # Creating palette
     palette = []
     MASK_RGB_DICT_keys = list(MASK_RGB_DICT.keys())
@@ -143,8 +153,16 @@ def create_annotation_with_color_map(seg_list_path, output_dir):
         sys.stdout.write('\r>> Converting annotation %d/%d' % (
             idx + 1, len(seg_list)))
         sys.stdout.flush()
-        img_np = np.array(Image.open(seg), dtype=np.int32)
-        height, width = img_np.shape[0], img_np.shape[1]
+
+        origin_img = Image.open(seg)
+        width, height = origin_img.size
+
+        if input_size != 0:
+            resize_ratio = 1.0 * input_size / max(width, height)
+            width, height = (int(resize_ratio * width), int(resize_ratio * height))
+            origin_img = origin_img.resize((width, height), Image.ANTIALIAS)
+
+        img_np = np.array(origin_img, dtype=np.int32)
         # Remove anti-aliasing artifact
         img_np += 5
         img_np = (img_np // 10) * 10
@@ -160,7 +178,7 @@ def create_annotation_with_color_map(seg_list_path, output_dir):
 
         annotation_2d = np.reshape(annotation, [height, width]).astype(np.uint8)
 
-        if args["remove_salt_and_pepper_noise"]:
+        if remove_noise:
             annotation_2d = cv2.medianBlur(annotation_2d, 3)
 
         pil_img = Image.fromarray(np.array(annotation_2d))
@@ -197,6 +215,7 @@ def separate_train_val_set(jpeg_folder, separate_folder):
 
 
 if __name__ == "__main__":
-    copy_background_jpeg(args["jpeg_list_path"], args["jpeg_folder"])
+    copy_background_jpeg(args["jpeg_list_path"], args["jpeg_folder"], args["input_size"])
     separate_train_val_set(args["jpeg_folder"], args["separate_folder"])
-    create_annotation_with_color_map(args["seg_list_path"], args["seg_folder"])
+    create_annotation_with_color_map(args["seg_list_path"], args["seg_folder"],
+                                     args["input_size"], args["remove_salt_and_pepper_noise"])
