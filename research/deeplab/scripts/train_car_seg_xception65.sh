@@ -109,7 +109,7 @@ python "${WORK_DIR}"/train.py \
   --initialize_last_layer=false \
   --tf_initial_checkpoint="${INIT_FOLDER}/${CKPT_NAME}/model.ckpt" \
   --train_logdir="${TRAIN_LOGDIR}" \
-  --dataset_dir="${PASCAL_DATASET}"
+  --dataset_dir="${CAR_DATASET}"
 
 # Run evaluation. This performs eval over the full val split (1449 images) and
 # will take a while.
@@ -128,7 +128,7 @@ python "${WORK_DIR}"/eval.py \
   --eval_crop_size=961 \
   --checkpoint_dir="${TRAIN_LOGDIR}" \
   --eval_logdir="${EVAL_LOGDIR}" \
-  --dataset_dir="${PASCAL_DATASET}" \
+  --dataset_dir="${CAR_DATASET}" \
   --max_number_of_evaluations=1
 
 # Visualize the results.
@@ -146,7 +146,7 @@ python "${WORK_DIR}"/vis.py \
   --vis_crop_size=961 \
   --checkpoint_dir="${TRAIN_LOGDIR}" \
   --vis_logdir="${VIS_LOGDIR}" \
-  --dataset_dir="${PASCAL_DATASET}" \
+  --dataset_dir="${CAR_DATASET}" \
   --max_number_of_iterations=1
 
 # Export the trained checkpoint.
