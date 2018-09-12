@@ -107,7 +107,7 @@ python "${WORK_DIR}"/train.py \
   --train_batch_size=16 \
   --training_number_of_steps="${NUM_ITERATIONS}" \
   --fine_tune_batch_norm=true \
-  --initialize_last_layer=false
+  --initialize_last_layer=false \
   --tf_initial_checkpoint="${INIT_FOLDER}/${CKPT_NAME}/model.ckpt-30000" \
   --train_logdir="${TRAIN_LOGDIR}" \
   --dataset_dir="${CAR_DATASET}"
