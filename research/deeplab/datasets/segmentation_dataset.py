@@ -99,9 +99,9 @@ _PASCAL_VOC_SEG_INFORMATION = DatasetDescriptor(
 
 _CAR_SEG_INFORMATION = DatasetDescriptor(
     splits_to_sizes={
-        'train': 3138,
-        'trainval': 3923,
-        'val': 785,
+        'train': 8312,
+        'trainval': 10390,
+        'val': 2078,
     },
     num_classes=28,
     ignore_label=255,

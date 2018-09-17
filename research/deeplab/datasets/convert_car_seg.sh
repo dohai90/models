@@ -51,7 +51,7 @@ fi
 cd "${CURRENT_DIR}"
 
 # Root path for car dataset before processing.
-DATA_ROOT="/content/dohai90/old_car_mask_data"
+DATA_ROOT="/notebooks/dohai90/car_data"
 
 # Root path for car dataset for processing.
 CAR_ROOT="${WORK_DIR}/VOCdevkit/VOC2012"
@@ -81,12 +81,12 @@ fi
 
 
 echo "Create backgrounds and annotations list..."
-python ./create_car_seg_datapath.py \
+python3 ./create_car_seg_datapath.py \
   --data_root="${DATA_ROOT}" \
   --output_list_dir="${WORK_DIR}"
 
 echo "Copies JPEG images and separates into train/val/trainval sets then creates color map annotations..."
-python ./preprocess_car_seg.py \
+python3 ./preprocess_car_seg.py \
   --seg_list_path="${CURRENT_DIR}/${WORK_DIR}/segmentations.txt" \
   --jpeg_list_path="${CURRENT_DIR}/${WORK_DIR}/backgrounds.txt" \
   --jpeg_folder="${IMAGE_FOLDER}" \
@@ -96,7 +96,7 @@ python ./preprocess_car_seg.py \
   --remove_salt_and_pepper_noise=true
 
 echo "Removing the color map in ground truth annotations..."
-python ./remove_gt_colormap.py \
+python3 ./remove_gt_colormap.py \
   --original_gt_folder="${SEG_FOLDER}" \
   --output_dir="${SEMANTIC_SEG_FOLDER}"
 
@@ -108,7 +108,7 @@ if [ ! -d "${OUTPUT_DIR}" ]; then
 fi
 
 echo "Converting CAR SEGMENTATION dataset to TFRecords..."
-python ./build_car_seg_data.py \
+python3 ./build_car_seg_data.py \
   --image_folder="${IMAGE_FOLDER}" \
   --semantic_segmentation_folder="${SEMANTIC_SEG_FOLDER}" \
   --list_folder="${LIST_FOLDER}" \
