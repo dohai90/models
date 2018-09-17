@@ -31,16 +31,18 @@ cd ..
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
 
 # Set up the working environment.
+export CUDA_VISIBLE_DEVICES="0, 1"
+
 CURRENT_DIR=$(pwd)
 WORK_DIR="${CURRENT_DIR}/deeplab"
 
 # Run model_test first to make sure the PYTHONPATH is correctly set.
-python "${WORK_DIR}"/model_test.py -v
+python3 "${WORK_DIR}"/model_test.py -v
 
 # Go to datasets folder and check car_seg is presented or not.
 # If not, run convert_car_seg.sh
 DATASET_DIR="datasets"
-CAR_FOLDER="car_seg"
+CAR_FOLDER="car_seg_resized_denoised"
 cd "${WORK_DIR}/${DATASET_DIR}"
 if [ ! -d "${CAR_FOLDER}" ]; then
   sh convert_car_seg.sh
@@ -88,15 +90,15 @@ cd "${CURRENT_DIR}"
 
 CAR_DATASET="${WORK_DIR}/${DATASET_DIR}/${CAR_FOLDER}/tfrecord"
 
-# Train 300000 iterations.
-NUM_ITERATIONS=300000
-python "${WORK_DIR}"/train.py \
+# Train 400000 iterations.
+NUM_ITERATIONS=400000
+python3 "${WORK_DIR}"/train.py \
   --logtostderr \
   --num_clones=2 \
   --dataset="car_seg" \
   --log_steps=100 \
-  --base_learning_rate=0.007 \
-  --train_split="trainval" \
+  --base_learning_rate=0.01 \
+  --train_split="train" \
   --model_variant="mobilenet_v2" \
   --output_stride=16 \
   --train_crop_size=513 \
@@ -104,20 +106,22 @@ python "${WORK_DIR}"/train.py \
   --train_batch_size=16 \
   --training_number_of_steps="${NUM_ITERATIONS}" \
   --fine_tune_batch_norm=true \
+  --initialize_last_layer=false \
   --tf_initial_checkpoint="${INIT_FOLDER}/${CKPT_NAME}/mobilenet_v2_1.0_224.ckpt" \
   --train_logdir="${TRAIN_LOGDIR}" \
-  --dataset_dir="${CAR_DATASET}"
+  --dataset_dir="${CAR_DATASET}" \
+  2>&1 | tee "${TRAIN_LOGDIR}/train.log"
   
   
 # Run evaluation. This performs eval over the full val split (785 images) and
 # will take a while.
-python "${WORK_DIR}"/eval.py \
+python3 "${WORK_DIR}"/eval.py \
   --logtostderr \
   --dataset="car_seg" \
   --eval_split="val" \
   --model_variant="mobilenet_v2" \
-  --eval_crop_size=961 \
-  --eval_crop_size=961 \
+  --eval_crop_size=769 \
+  --eval_crop_size=769 \
   --checkpoint_dir="${TRAIN_LOGDIR}" \
   --eval_logdir="${EVAL_LOGDIR}" \
   --dataset_dir="${CAR_DATASET}" \
@@ -129,18 +133,21 @@ python "${WORK_DIR}"/vis.py \
   --dataset="car_seg" \
   --vis_split="val" \
   --model_variant="mobilenet_v2" \
-  --vis_crop_size=961 \
-  --vis_crop_size=961 \
+  --vis_crop_size=769 \
+  --vis_crop_size=769 \
   --checkpoint_dir="${TRAIN_LOGDIR}" \
   --vis_logdir="${VIS_LOGDIR}" \
   --dataset_dir="${CAR_DATASET}" \
   --max_number_of_iterations=1
 
+# Set up the working environment to export model via CPU.
+export CUDA_VISIBLE_DEVICES=""
+
 # Export the trained checkpoint.
 CKPT_PATH="${TRAIN_LOGDIR}/model.ckpt-${NUM_ITERATIONS}"
 EXPORT_PATH="${EXPORT_DIR}/frozen_inference_graph.pb"
 
-python "${WORK_DIR}"/export_model.py \
+python3 "${WORK_DIR}"/export_model.py \
   --logtostderr \
   --checkpoint_path="${CKPT_PATH}" \
   --export_path="${EXPORT_PATH}" \
