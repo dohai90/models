@@ -40,6 +40,9 @@ def list_backgrounds_and_annotations_path(data_root, output_list_dir):
         if '_0001_Background.jpg' in str(os.path.basename(path)):
             background_paths.append(path)
 
+    background_paths.sort()
+    annotation_paths.sort()
+
     for annotation_path in annotation_paths:
         if not os.path.isfile(annotation_path):
             continue
