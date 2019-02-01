@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">CarMasking</string>
+    <string name="btn_prev">Prev</string>
+    <string name="btn_next">Next</string>
+    <string name="btn_mask">Mask</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_load">Load</string>
+</resources>

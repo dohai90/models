@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <ImageSwitcher
+        android:id="@+id/simpleImageSwitcher"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/btn_mask"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar" />
+
+    <Button
+        android:id="@+id/btn_load"
+        android:layout_width="50dp"
+        android:layout_height="39dp"
+        android:layout_marginBottom="16dp"
+        android:onClick="onImageSelectingClicked"
+        android:text="@string/btn_load"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btn_save" />
+
+    <Button
+        android:id="@+id/btn_save"
+        android:layout_width="50dp"
+        android:layout_height="39dp"
+        android:text="@string/btn_save"
+        app:layout_constraintBaseline_toBaselineOf="@+id/btn_load"
+        app:layout_constraintEnd_toStartOf="@+id/btn_load"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btn_mask" />
+
+    <Button
+        android:id="@+id/btn_mask"
+        android:layout_width="50dp"
+        android:layout_height="39dp"
+        android:onClick="onImageMaskingClicked"
+        android:text="@string/btn_mask"
+        app:layout_constraintBaseline_toBaselineOf="@+id/btn_save"
+        app:layout_constraintEnd_toStartOf="@+id/btn_save"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btn_next" />
+
+    <Button
+        android:id="@+id/btn_next"
+        android:layout_width="50dp"
+        android:layout_height="39dp"
+        android:onClick="onImageSwitchingNextClicked"
+        android:text="@string/btn_next"
+        app:layout_constraintBaseline_toBaselineOf="@+id/btn_mask"
+        app:layout_constraintEnd_toStartOf="@+id/btn_mask"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btn_prev" />
+
+    <Button
+        android:id="@+id/btn_prev"
+        android:layout_width="50dp"
+        android:layout_height="39dp"
+        android:onClick="onImageSwitchingPrevClicked"
+        android:text="@string/btn_prev"
+        app:layout_constraintBaseline_toBaselineOf="@+id/btn_next"
+        app:layout_constraintEnd_toStartOf="@+id/btn_next"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+</android.support.constraint.ConstraintLayout>
